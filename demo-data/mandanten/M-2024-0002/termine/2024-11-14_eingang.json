@@ -1,0 +1,14 @@
+{
+  "id": "25805976-f44b-41ca-957a-f82204f40616",
+  "mandant_id": "M-2024-0002",
+  "typ": "erinnerung",
+  "titel": "Unterlageneingang bestätigt",
+  "datum": "2024-11-14",
+  "uhrzeit": null,
+  "prioritaet": "niedrig",
+  "erledigt": true,
+  "erstellt": "2024-11-15T10:00:00+01:00",
+  "quelle_notiz_id": "10353b73-c2ac-4c30-a11f-d96da1643e07",
+  "ai_erkannt": false,
+  "notiz": "Fiktiver Demotermin. Datum und fachliche Grundlage [PRÜFEN]."
+}

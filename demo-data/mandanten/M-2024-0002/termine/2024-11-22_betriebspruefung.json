@@ -1,0 +1,14 @@
+{
+  "id": "9285a844-0941-4ed4-b3fd-fc85854aaf20",
+  "mandant_id": "M-2024-0002",
+  "typ": "termin",
+  "titel": "Betriebsprüfung vorbereiten",
+  "datum": "2024-11-22",
+  "uhrzeit": "09:00",
+  "prioritaet": "hoch",
+  "erledigt": false,
+  "erstellt": "2024-11-15T10:00:00+01:00",
+  "quelle_notiz_id": "5cc64bbc-db7b-4540-b7f0-e405bb0f638a",
+  "ai_erkannt": false,
+  "notiz": "Fiktiver Demotermin. Datum und fachliche Grundlage [PRÜFEN]."
+}

@@ -1,0 +1,40 @@
+{
+  "version": "1",
+  "erstellt": "2024-11-15T10:00:00+01:00",
+  "aktualisiert": "2024-11-15T10:00:00+01:00",
+  "mandanten": [
+    {
+      "id": "M-2024-0001",
+      "name": "Huber GmbH",
+      "aktiv": true,
+      "letzte_aktivitaet": "2024-11-15T10:00:00+01:00",
+      "statistik": {
+        "notizen": 3,
+        "termine_offen": 2,
+        "entscheidungen": 1
+      }
+    },
+    {
+      "id": "M-2024-0002",
+      "name": "Schmidt & Partner Steuerberatungs-KG",
+      "aktiv": true,
+      "letzte_aktivitaet": "2024-11-15T10:00:00+01:00",
+      "statistik": {
+        "notizen": 2,
+        "termine_offen": 2,
+        "entscheidungen": 1
+      }
+    },
+    {
+      "id": "M-2024-0003",
+      "name": "Dr. Ingrid Berger",
+      "aktiv": true,
+      "letzte_aktivitaet": "2024-11-15T10:00:00+01:00",
+      "statistik": {
+        "notizen": 2,
+        "termine_offen": 1,
+        "entscheidungen": 1
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "id": "M-2024-0001",
+  "name": "Huber GmbH",
+  "rechtsform": "GmbH",
+  "ansprechpartner": "Max Huber",
+  "telefon": "",
+  "email": "demo1@example.invalid",
+  "steuer_id": "",
+  "finanzamt": "München [DEMO]",
+  "wirtschaftsjahr_ende": "12-31",
+  "mandant_seit": "2018-03-01",
+  "bearbeiter": "Dr. Müller [DEMO]",
+  "kategorie": "GmbH",
+  "branchen_code": "62",
+  "aktiv": true,
+  "ai_features_aktiv": true,
+  "notizen": "Fiktive Demodaten; sämtliche fachlichen Angaben [PRÜFEN]."
+}
