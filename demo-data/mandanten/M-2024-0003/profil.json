@@ -1,0 +1,18 @@
+{
+  "id": "M-2024-0003",
+  "name": "Dr. Ingrid Berger",
+  "rechtsform": "Einzelunternehmen",
+  "ansprechpartner": "Dr. Ingrid Berger",
+  "telefon": "",
+  "email": "demo3@example.invalid",
+  "steuer_id": "",
+  "finanzamt": "Frankfurt [DEMO]",
+  "wirtschaftsjahr_ende": "12-31",
+  "mandant_seit": "2020-01-15",
+  "bearbeiter": "Dr. Müller [DEMO]",
+  "kategorie": "Einzelunternehmen",
+  "branchen_code": "86",
+  "aktiv": true,
+  "ai_features_aktiv": true,
+  "notizen": "Fiktive Demodaten; sämtliche fachlichen Angaben [PRÜFEN]."
+}

@@ -1,0 +1,14 @@
+{
+  "id": "55af7e64-4ef8-4b1a-99ea-b46538336ba1",
+  "mandant_id": "M-2024-0001",
+  "typ": "termin",
+  "titel": "Jahresabschluss-Besprechung",
+  "datum": "2024-11-15",
+  "uhrzeit": "14:00",
+  "prioritaet": "mittel",
+  "erledigt": false,
+  "erstellt": "2024-11-15T10:00:00+01:00",
+  "quelle_notiz_id": "96ae2e13-424f-443c-9284-37aacb0eade9",
+  "ai_erkannt": false,
+  "notiz": "Fiktiver Demotermin. Datum und fachliche Grundlage [PRÜFEN]."
+}

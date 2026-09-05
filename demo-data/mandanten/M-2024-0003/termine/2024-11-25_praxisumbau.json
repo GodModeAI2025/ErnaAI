@@ -1,0 +1,14 @@
+{
+  "id": "2f6ba01c-1cfa-4611-aacb-30c77ddb9d37",
+  "mandant_id": "M-2024-0003",
+  "typ": "termin",
+  "titel": "Unterlagen Praxisumbau besprechen",
+  "datum": "2024-11-25",
+  "uhrzeit": "11:00",
+  "prioritaet": "mittel",
+  "erledigt": false,
+  "erstellt": "2024-11-15T10:00:00+01:00",
+  "quelle_notiz_id": "fb537dd9-85e5-417f-99e2-0bc6029510d9",
+  "ai_erkannt": false,
+  "notiz": "Fiktiver Demotermin. Datum und fachliche Grundlage [PRÜFEN]."
+}
