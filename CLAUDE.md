@@ -593,12 +593,11 @@ Wenn keine relevante Information vorhanden: sage das klar.
 Sprache: Deutsch. Sei präzise, keine Vermutungen.
 `,
 
-  SUCHE_USER: (anfrage: string, kontext: string) => `
-Suchanfrage: "${anfrage}"
-
-KANZLEIAKTE:
-${kontext}
-`,
+  // Akte zuerst (stabiler, cachebarer Präfix), Suchanfrage zuletzt – siehe README „Volltext- und KI-Suche“
+  SUCHE_USER: (anfrage: string, kontext: string): Anthropic.TextBlockParam[] => [
+    { type: 'text', text: `KANZLEIAKTE:\n${kontext}\n`, cache_control: { type: 'ephemeral' } },
+    { type: 'text', text: `Suchanfrage: "${anfrage}"\n\nBeantworte die Suchanfrage anhand der obigen Kanzleiakte.\n` },
+  ],
 
   TAGESBRIEF_SYSTEM: `
 Du bist der morgendliche Kanzleiassistent. Erstelle eine klare, priorisierte Tagesübersicht.

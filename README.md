@@ -178,6 +178,8 @@ Für Dateikontexte gelten folgende Grenzen:
 - Der gesamte Kontext bleibt bei höchstens **600 KB** Text, entsprechend einer groben Schätzung von 150.000 Tokens. Das ist keine exakte Tokenzählung.
 - Die KI-Suche hebt die 100-Dateien-Grenze auf und berücksichtigt alle Dateien, soweit sie in das Textbudget passen. Ältere ausgelassene Dateien werden durch `[X Dateien ausgelassen]` kenntlich gemacht.
 
+**Prompt-Caching bei Folgefragen:** Die KI-Suche sendet zuerst die Akte und danach die Suchanfrage. Die Akte ist für das Prompt-Caching der Claude API markiert. Stellen Sie innerhalb von etwa fünf Minuten eine weitere Frage zur selben, unveränderten Akte, liest die API diesen Teil aus dem Cache: Das geht schneller und wird deutlich günstiger abgerechnet. Die erste Anfrage kostet für den Aktenteil etwas mehr als ohne Cache. Jede Änderung an der Akte, am Mandantennamen oder am Modell erzeugt einen neuen Cache-Eintrag. Kleine Akten liegen unter der Mindestgröße des Modells und werden ohne Fehlermeldung einfach nicht gecacht. Übertragen werden dieselben Daten wie ohne Caching.
+
 ## Datenschutz und Datenhaltung
 
 Vor der Freigabe zeigt ERNA-AI diesen Hinweis:

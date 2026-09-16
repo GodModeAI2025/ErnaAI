@@ -70,7 +70,7 @@ async function backoff(milliseconds: number, signal: AbortSignal): Promise<void>
 
 export async function callClaude(
   systemPrompt: string,
-  userMessage: string,
+  userMessage: string | Anthropic.TextBlockParam[],
   onUpdate?: (text: string) => void,
   options: AiOptions = {},
 ): Promise<string> {

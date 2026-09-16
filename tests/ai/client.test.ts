@@ -85,6 +85,11 @@ describe('Streaming, Wiederholungen und Gesamtzeitlimit', () => {
     expect(sdk.stream.mock.calls[0]?.[0]).toMatchObject({ model: MODEL, max_tokens: 4096 });
     expect(sdk.construct.mock.calls[0]?.[0]).toMatchObject({ maxRetries: 0 });
   });
+  it('reicht Inhaltsblöcke mit Cache-Markierung unverändert an die API weiter', async () => {
+    const content = [{ type: 'text' as const, text: 'Akte', cache_control: { type: 'ephemeral' as const } }, { type: 'text' as const, text: 'Frage' }];
+    await callClaude('System', content, undefined, options);
+    expect(sdk.stream.mock.calls[0]?.[0]).toMatchObject({ messages: [{ role: 'user', content }] });
+  });
   it('gibt einer Umgebungsvariablen Vorrang vor dem konfigurierten Modell', async () => {
     vi.stubEnv('ERNA_AI_MODEL', 'claude-sonnet-4-5');
     await callClaude('System', 'Text', undefined, options);
