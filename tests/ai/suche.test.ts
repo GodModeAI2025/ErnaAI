@@ -25,6 +25,10 @@ beforeEach(async () => {
   const config = structuredClone(DEFAULT_CONFIG); config.ai.datenschutzAkzeptiert = true; await saveConfig(config);
   vi.spyOn(client, 'callClaude').mockImplementation(async (_system, _user, onUpdate) => { onUpdate?.('Antwort'); onUpdate?.('Antwort mit Quelle'); return 'Antwort mit Quelle'; });
 });
+const userText = (call = 0): string => {
+  const user = vi.mocked(client.callClaude).mock.calls[call]?.[1];
+  return typeof user === 'string' ? user : (user ?? []).map(block => block.text).join('\n');
+};
 afterEach(async () => { vi.restoreAllMocks(); vi.unstubAllEnvs(); vi.useRealTimers(); await rm(root, { recursive: true, force: true }); });
 
 describe('Lokale Volltextsuche', () => {
@@ -63,7 +67,23 @@ describe('KI-Suche', () => {
     expect(result.ausgelassen).toBe(0);
     expect(result.quellen.map(source => source.id)).toContain(original.id);
     expect(vi.mocked(client.callClaude).mock.calls[0]?.[3]).toMatchObject({ timeoutMs: 90_000, mandantIds: [profile.id] });
-    for (const source of result.quellen) expect(vi.mocked(client.callClaude).mock.calls[0]?.[1]).toContain(`=== DATEI: ${source.pfad} (${source.datum}) ===`);
+    for (const source of result.quellen) expect(userText()).toContain(`=== DATEI: ${source.pfad} (${source.datum}) ===`);
+  });
+  it('stellt die Akte als cachebaren Block vor die wechselnde Suchanfrage', async () => {
+    await saveNotiz(note());
+    await sucheMitAi(profile.id, 'Erste Frage');
+    await sucheMitAi(profile.id, 'Zweite Frage');
+    const [first, second] = vi.mocked(client.callClaude).mock.calls.map(call => call[1]);
+    if (typeof first === 'string' || typeof second === 'string' || !first || !second) throw new Error('Suchanfrage muss als Inhaltsblöcke übergeben werden.');
+    expect(first).toHaveLength(2);
+    expect(first[0]).toMatchObject({ type: 'text', cache_control: { type: 'ephemeral' } });
+    expect(first[0]?.text).toContain('KANZLEIAKTE:');
+    expect(first[0]?.text).not.toContain('Erste Frage');
+    expect(first[1]?.text).toContain('Suchanfrage: "Erste Frage"');
+    expect(first[1]).not.toHaveProperty('cache_control');
+    // Byte-identischer Präfix ist Voraussetzung für einen Cache-Treffer bei der Folgefrage.
+    expect(second[0]).toEqual(first[0]);
+    expect(second[1]?.text).toContain('Zweite Frage');
   });
   it('lädt mehr als 100 Dateien, solange das Textbudget ausreicht', async () => {
     await Promise.all(Array.from({ length: 105 }, async (_, index) => {
@@ -73,7 +93,7 @@ describe('KI-Suche', () => {
     const result = await sucheMitAi(profile.id, 'Alle Quellen');
     expect(result.quellen).toHaveLength(106);
     expect(result.ausgelassen).toBe(0);
-    expect(vi.mocked(client.callClaude).mock.calls[0]?.[1]).toContain('quelle-104.md');
+    expect(userText()).toContain('quelle-104.md');
   });
   it('nennt bei Budgetüberschreitung ausschließlich tatsächlich übermittelte Dateien', async () => {
     const paths: string[] = [];
@@ -84,7 +104,7 @@ describe('KI-Suche', () => {
       await writeText(dataPath(relative), markdownText(document));
     }));
     const result = await sucheMitAi(profile.id, 'Überblick');
-    const prompt = String(vi.mocked(client.callClaude).mock.calls[0]?.[1]);
+    const prompt = userText();
     expect(result.ausgelassen).toBeGreaterThan(0);
     expect(prompt).toContain(`[${result.ausgelassen} Dateien ausgelassen]`);
     expect(prompt.match(/=== DATEI:/gu)).toHaveLength(result.quellen.length);
