@@ -17,7 +17,7 @@ class FakeStream {
   on(_event: string, listener: Listener): this { this.listeners.add(listener); return this; }
   off(_event: string, listener: Listener): this { this.listeners.delete(listener); return this; }
   emit(delta: string, snapshot = delta): void { for (const listener of this.listeners) listener(delta, snapshot); }
-  finalMessage = vi.fn(async (): Promise<{ stop_reason: string | null; content: { type: string; text: string }[] }> => {
+  finalMessage = vi.fn(async (): Promise<{ stop_reason: string | null; content: { type: string; text: string }[]; usage?: Record<string, number> }> => {
     this.emit('Erster Text', 'Erster Text');
     this.emit(' und zweiter Text', ' und zweiter Text');
     return { stop_reason: 'end_turn', content: [{ type: 'text', text: 'Erster Text und zweiter Text' }] };
@@ -84,6 +84,19 @@ describe('Streaming, Wiederholungen und Gesamtzeitlimit', () => {
     expect(update.mock.calls.map(call => call[0])).toEqual(['Erster Text', 'Erster Text und zweiter Text']);
     expect(sdk.stream.mock.calls[0]?.[0]).toMatchObject({ model: MODEL, max_tokens: 4096 });
     expect(sdk.construct.mock.calls[0]?.[0]).toMatchObject({ maxRetries: 0 });
+  });
+  it('meldet die Tokenzahlen der Antwort inklusive Cache-Feldern', async () => {
+    const stream = new FakeStream();
+    stream.finalMessage.mockResolvedValue({ stop_reason: 'end_turn', content: [{ type: 'text', text: 'Antwort' }], usage: { input_tokens: 40, output_tokens: 12, cache_read_input_tokens: 102_988, cache_creation_input_tokens: 0 } });
+    sdk.stream.mockReturnValue(stream);
+    const onVerbrauch = vi.fn();
+    await callClaude('System', 'Text', undefined, { ...options, onVerbrauch });
+    expect(onVerbrauch).toHaveBeenCalledExactlyOnceWith({ eingabeNeu: 40, cacheGelesen: 102_988, cacheGeschrieben: 0, ausgabe: 12 });
+  });
+  it('meldet nichts, wenn die API keine Tokenzahlen liefert', async () => {
+    const onVerbrauch = vi.fn();
+    await callClaude('System', 'Text', undefined, { ...options, onVerbrauch });
+    expect(onVerbrauch).not.toHaveBeenCalled();
   });
   it('reicht Inhaltsblöcke mit Cache-Markierung unverändert an die API weiter', async () => {
     const content = [{ type: 'text' as const, text: 'Akte', cache_control: { type: 'ephemeral' as const } }, { type: 'text' as const, text: 'Frage' }];

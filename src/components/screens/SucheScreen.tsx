@@ -6,7 +6,7 @@ import { THEME } from '../../app/constants.js';
 import { AiResponseError } from '../../ai/client.js';
 import { sucheMitAi, volltextSuche } from '../../ai/suche.js';
 import { displayDate } from '../../utils/dates.js';
-import { errorMessage, terminalText } from '../../utils/format.js';
+import { errorMessage, terminalText, verbrauchText } from '../../utils/format.js';
 import { isReservedInput } from '../../utils/keyboard.js';
 import { ScrollableText } from '../layout/ContentPane.js';
 import { AiLoadingSpinner } from '../shared/AiLoadingSpinner.js';
@@ -31,7 +31,7 @@ export function SucheScreen() {
         if(!context.aiAvailable)throw new Error('KI-Suche ist deaktiviert. API-Schlüssel und Datenschutzfreigabe in den Einstellungen prüfen.');
         const result=await sucheMitAi(mandantId,query.trim(),text=>{if(request===epoch.current&&!abort.signal.aborted)setOutput(text);},{signal:abort.signal});
         if(request!==epoch.current||abort.signal.aborted)return;
-        setOutput(`${result.antwort}\n\nQUELLEN DER ÜBERGEBENEN AKTE\n${result.quellen.map(source=>`${source.pfad} · ${displayDate(source.datum)}`).join('\n')}${result.ausgelassen?`\n[${result.ausgelassen} Dateien ausgelassen]`:''}`);
+        setOutput(`${result.antwort}\n\nQUELLEN DER ÜBERGEBENEN AKTE\n${result.quellen.map(source=>`${source.pfad} · ${displayDate(source.datum)}`).join('\n')}${result.ausgelassen?`\n[${result.ausgelassen} Dateien ausgelassen]`:''}${result.verbrauch?`\n${verbrauchText(result.verbrauch)}`:''}`);
       }
     }catch(cause){if(request===epoch.current&&!abort.signal.aborted){setError(errorMessage(cause));if(cause instanceof AiResponseError)setOutput(`ROHTEXT\n${cause.rawText}`);}}
     finally{if(request===epoch.current)setBusy(false);}

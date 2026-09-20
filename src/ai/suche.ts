@@ -1,5 +1,5 @@
 import matter from 'gray-matter';
-import type { AiOptions, Quelldatei, SuchTreffer } from '../app/types.js';
+import type { AiOptions, AiVerbrauch, Quelldatei, SuchTreffer } from '../app/types.js';
 import { getMandant } from '../data/mandanten.js';
 import { record, stringField } from '../utils/format.js';
 import { assertAiActive, assertAiAllowed, callClaude, withAiDeadline } from './client.js';
@@ -35,7 +35,7 @@ export async function sucheMitAi(
   anfrage: string,
   onUpdate?: (text: string) => void,
   options: AiOptions = {},
-): Promise<{ antwort: string; quellen: Quelldatei[]; ausgelassen: number }> {
+): Promise<{ antwort: string; quellen: Quelldatei[]; ausgelassen: number; verbrauch: AiVerbrauch | null }> {
   if (!anfrage.trim()) throw new Error('Bitte eine Suchanfrage eingeben.');
   const scopedOptions = { ...options, timeoutMs: options.timeoutMs ?? 90_000, mandantIds: [mandantId] };
   return withAiDeadline(async signal => {
@@ -46,8 +46,11 @@ export async function sucheMitAi(
     ]);
     assertAiActive(signal);
     const update = (text: string): void => { if (!signal.aborted) onUpdate?.(text); };
-    const antwort = await callClaude(PROMPTS.SUCHE_SYSTEM(mandant.name), PROMPTS.SUCHE_USER(anfrage.trim(), context.text), update, { ...scopedOptions, signal });
+    let verbrauch: AiVerbrauch | null = null;
+    const antwort = await callClaude(PROMPTS.SUCHE_SYSTEM(mandant.name), PROMPTS.SUCHE_USER(anfrage.trim(), context.text), update, {
+      ...scopedOptions, signal, onVerbrauch: value => { verbrauch = value; options.onVerbrauch?.(value); },
+    });
     assertAiActive(signal);
-    return { antwort, quellen: context.quellen, ausgelassen: context.ausgelassen };
+    return { antwort, quellen: context.quellen, ausgelassen: context.ausgelassen, verbrauch };
   }, scopedOptions);
 }

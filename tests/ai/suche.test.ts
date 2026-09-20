@@ -85,6 +85,19 @@ describe('KI-Suche', () => {
     expect(second[0]).toEqual(first[0]);
     expect(second[1]?.text).toContain('Zweite Frage');
   });
+  it('gibt die gemeldeten Tokenzahlen weiter, damit ein Cache-Treffer sichtbar wird', async () => {
+    await saveNotiz(note());
+    vi.mocked(client.callClaude).mockImplementation(async (_system, _user, _onUpdate, options) => {
+      options?.onVerbrauch?.({ eingabeNeu: 40, cacheGelesen: 102_988, cacheGeschrieben: 0, ausgabe: 12 });
+      return 'Antwort';
+    });
+    const result = await sucheMitAi(profile.id, 'Welche Belege fehlen?');
+    expect(result.verbrauch).toEqual({ eingabeNeu: 40, cacheGelesen: 102_988, cacheGeschrieben: 0, ausgabe: 12 });
+  });
+  it('liefert ohne gemeldete Tokenzahlen keinen erfundenen Verbrauch', async () => {
+    await saveNotiz(note());
+    expect((await sucheMitAi(profile.id, 'Welche Belege fehlen?')).verbrauch).toBeNull();
+  });
   it('lädt mehr als 100 Dateien, solange das Textbudget ausreicht', async () => {
     await Promise.all(Array.from({ length: 105 }, async (_, index) => {
       const document = { ...note(), titel: `Quelle ${index}`, inhalt: `Information aus Quelle ${index}.` };
