@@ -1,3 +1,4 @@
+import type { AiVerbrauch } from '../app/types.js';
 export const slugify = (value: string): string => value.toLocaleLowerCase('de').replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 70) || 'eintrag';
 export const truncate = (value: string, length: number): string => value.length > length ? value.slice(0, Math.max(0, length - 1)) + '…' : value;
 // Dateiinhalte und API-Antworten dürfen keine Terminal-Steuersequenzen ausführen.
@@ -18,3 +19,12 @@ export function stringField(object: Record<string, unknown>, key: string): strin
   const value = object[key]; if (typeof value !== 'string') throw new Error(`Ungültiges Textfeld: ${key}`); return value;
 }
 export function stringArray(value: unknown): value is string[] { return Array.isArray(value) && value.every(item => typeof item === 'string'); }
+// Ohne diese Zeile bleibt unsichtbar, ob das Prompt-Caching der KI-Suche wirklich greift.
+export function verbrauchText(verbrauch: AiVerbrauch): string {
+  const zahl = (value: number): string => value.toLocaleString('de-DE');
+  const eingabe = verbrauch.eingabeNeu + verbrauch.cacheGelesen + verbrauch.cacheGeschrieben;
+  const cache = verbrauch.cacheGelesen ? `${zahl(verbrauch.cacheGelesen)} aus dem Cache`
+    : verbrauch.cacheGeschrieben ? `${zahl(verbrauch.cacheGeschrieben)} neu zwischengespeichert`
+      : 'ohne Cache-Treffer';
+  return `TOKENS: ${zahl(eingabe)} Eingabe (${cache}) · ${zahl(verbrauch.ausgabe)} Ausgabe`;
+}

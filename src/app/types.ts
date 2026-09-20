@@ -45,7 +45,10 @@ export interface StrukturierteNotiz {
   zusammenfassung: string; tags: string[]; erkannte_fristen: { titel: string; datum: string | null; original_text: string }[];
   folgeaktionen: string[]; prioritaet: Prioritaet; kategorie: 'rückfrage' | 'information' | 'aufgabe' | 'besprechung' | 'sonstiges';
 }
-export interface AiOptions { timeoutMs?: number; signal?: AbortSignal; model?: string; mandantIds?: readonly string[] }
+/** Tokenzahlen eines Claude-Aufrufs. eingabeNeu zählt nur den nicht gecachten Rest;
+ * die gesamte Eingabe ist eingabeNeu + cacheGelesen + cacheGeschrieben. */
+export interface AiVerbrauch { eingabeNeu: number; cacheGelesen: number; cacheGeschrieben: number; ausgabe: number }
+export interface AiOptions { timeoutMs?: number; signal?: AbortSignal; model?: string; mandantIds?: readonly string[]; onVerbrauch?: (verbrauch: AiVerbrauch) => void }
 export interface KontextOptions { includeNotizen?: boolean; includeTermine?: boolean; includeEntscheidungen?: boolean; maxFiles?: number; maxTokensEstimate?: number }
 export type AiAction = 'strukturieren' | 'fristen' | 'entscheidung' | 'suche' | 'tagesbrief' | 'alle';
 export interface AppContextValue {

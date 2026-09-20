@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import type { AiOptions, ErnaConfig } from '../app/types.js';
+import type { AiOptions, AiVerbrauch, ErnaConfig } from '../app/types.js';
 import { loadConfig } from '../data/filesystem.js';
 import { getMandant } from '../data/mandanten.js';
 
@@ -68,6 +68,18 @@ async function backoff(milliseconds: number, signal: AbortSignal): Promise<void>
   });
 }
 
+/** Die API meldet gecachte Eingabe getrennt; ohne diese Felder bliebe ein Cache-Treffer unsichtbar.
+ * Fehlt die Angabe, wird nichts gemeldet — eine erfundene Null wäre irreführender als keine Zahl. */
+function verbrauch(usage: Partial<Anthropic.Messages.Usage> | undefined): AiVerbrauch | null {
+  if (!usage || typeof usage.input_tokens !== 'number' || typeof usage.output_tokens !== 'number') return null;
+  return {
+    eingabeNeu: usage.input_tokens,
+    cacheGelesen: usage.cache_read_input_tokens ?? 0,
+    cacheGeschrieben: usage.cache_creation_input_tokens ?? 0,
+    ausgabe: usage.output_tokens,
+  };
+}
+
 export async function callClaude(
   systemPrompt: string,
   userMessage: string | Anthropic.TextBlockParam[],
@@ -97,6 +109,8 @@ export async function callClaude(
         try {
           const message = await stream.finalMessage();
           assertAiActive(signal);
+          const gemessen = verbrauch(message.usage);
+          if (gemessen) options.onVerbrauch?.(gemessen);
           const text = message.content.filter(block => block.type === 'text').map(block => block.text).join('\n');
           if (message.stop_reason === 'max_tokens') throw new AiResponseError('Claude-Antwort wurde wegen des Ausgabelimits abgeschnitten.', text);
           if (message.stop_reason === 'model_context_window_exceeded') throw new AiResponseError('Claude-Antwort wurde wegen des Kontextlimits nicht vollständig abgeschlossen.', text);

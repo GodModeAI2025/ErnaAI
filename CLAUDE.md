@@ -463,12 +463,16 @@ export const MAX_TOKENS = 4096;
 export async function callClaude(
   systemPrompt: string,
   userMessage: string,
-  onUpdate?: (text: string) => void  // für Streaming
+  onUpdate?: (text: string) => void,  // für Streaming
+  options?: { onVerbrauch?: (verbrauch: AiVerbrauch) => void }
 ): Promise<string> {
   // Implementiere Retry-Logik: 3 Versuche, exponentieller Backoff
   // Bei Fehler: klare Fehlermeldung, kein App-Crash
   // Timeout nach 60 Sekunden
   // Bei fehlender API-Key: sofort klarer Fehler "ANTHROPIC_API_KEY nicht gesetzt"
+  // usage der Antwort an onVerbrauch melden (input_tokens, output_tokens,
+  // cache_read_input_tokens, cache_creation_input_tokens). Fehlen die Zahlen,
+  // wird nichts gemeldet – eine erfundene Null wäre irreführender als keine Zahl.
 }
 ```
 
@@ -594,6 +598,8 @@ Sprache: Deutsch. Sei präzise, keine Vermutungen.
 `,
 
   // Akte zuerst (stabiler, cachebarer Präfix), Suchanfrage zuletzt – siehe README „Volltext- und KI-Suche“
+  // sucheMitAi gibt den gemeldeten Verbrauch mit zurück; die Suche zeigt ihn als TOKENS-Zeile,
+  // sonst bliebe unsichtbar, ob der Cache überhaupt greift.
   SUCHE_USER: (anfrage: string, kontext: string): Anthropic.TextBlockParam[] => [
     { type: 'text', text: `KANZLEIAKTE:\n${kontext}\n`, cache_control: { type: 'ephemeral' } },
     { type: 'text', text: `Suchanfrage: "${anfrage}"\n\nBeantworte die Suchanfrage anhand der obigen Kanzleiakte.\n` },
